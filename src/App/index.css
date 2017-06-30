@@ -1,0 +1,17 @@
+.app {
+  padding: 30px;
+}
+
+@media only screen and (max-width: 767px) {
+  .app {
+    padding: 20px  !important;
+  }
+
+  .large-screen-only {
+    display: none !important;
+  }
+
+  .small-screen-only {
+    display: block !important;
+  }
+}

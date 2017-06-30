@@ -1,0 +1,17 @@
+{
+  "plugins": [ "react", "babel" ],
+  "extends": [ "react-app", "prometheusresearch" ],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 6,
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "env": {
+    "es6": true
+  },
+  "rules": {
+    "linebreak-style": "warn"
+  }
+}

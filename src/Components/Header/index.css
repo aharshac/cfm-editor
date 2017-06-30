@@ -1,0 +1,49 @@
+.header h2{
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  height: 40px;
+  padding-bottom: 30px;
+}
+
+/* logo */
+.logo-collaborizm, .logo-react {
+  vertical-align: middle;
+  display: inline;
+}
+
+.logo-collaborizm {
+  height: 45px;
+  margin-left: 20px;
+}
+
+.logo-react {
+  height: 50px;
+  animation: logo-react-spin infinite 20s linear;
+}
+
+@keyframes logo-react-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+@media only screen and (max-width: 767px) {
+  .header{
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  /* hide logos on mobile (width < 768 px) */
+  .logo-collaborizm, .logo-react {
+    display: none !important;
+  }
+
+  .large-screen-only {
+    display: none !important;
+  }
+
+  .small-screen-only {
+    display: block !important;
+  }
+}
