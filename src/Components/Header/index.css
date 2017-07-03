@@ -1,49 +1,58 @@
+.header {
+  padding-bottom: 10px;
+}
+
 .header h2{
   display: inline-block;
-  height: 100%;
   vertical-align: middle;
-  height: 40px;
-  padding-bottom: 30px;
+  font-size: 30px;
+  margin: 0;
 }
 
 /* logo */
-.logo-collaborizm, .logo-react {
-  vertical-align: middle;
-  display: inline;
+.icons {
+  vertical-align: top;
+  display: inline-block;
+  height: auto;
 }
 
-.logo-collaborizm {
-  height: 45px;
+.logoCollaborizm, .logoReact {
+  vertical-align: center;
+  display: inline-block;
+}
+
+.logoCollaborizm {
+  height: 30px;
   margin-left: 20px;
 }
 
-.logo-react {
-  height: 50px;
-  animation: logo-react-spin infinite 20s linear;
+.logoReact {
+  height: 35px;
+  animation: logoReactSpin infinite 20s linear;
 }
 
-@keyframes logo-react-spin {
+@keyframes logoReactSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
 
-@media only screen and (max-width: 767px) {
+@media (--small) {
   .header{
     margin-bottom: 10px;
     text-align: center;
   }
 
   /* hide logos on mobile (width < 768 px) */
-  .logo-collaborizm, .logo-react {
+  .logoCollaborizm, .logoReact {
     display: none !important;
   }
 
-  .large-screen-only {
+  .largeScreenOnly {
     display: none !important;
   }
 
-  .small-screen-only {
+  .smallScreenOnly {
     display: block !important;
   }
 }

@@ -8,7 +8,6 @@ const ExtLink = ({ href, children, ...otherProps }) => (
 );
 
 ExtLink.propTypes = {
-  title: PropTypes.string,
   href: PropTypes.string.isRequired,
   children: PropTypes.node
 };

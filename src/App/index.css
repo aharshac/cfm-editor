@@ -1,17 +1,49 @@
 .app {
-  padding: 30px;
+  padding: 20px;
 }
 
-@media only screen and (max-width: 767px) {
+.container {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.io {
+  flex: 1;
+  overflow-x: auto;
+}
+
+.toolbar {
+  padding: 10px 0 10px 0;
+}
+
+.toolbarButton {
+  margin-bottom: 10px !important;
+}
+
+.toolbarButtonRight {
+  /*float: right !important;*/
+  margin-left: 40px !important;
+}
+
+@media (--small) {
   .app {
     padding: 20px  !important;
   }
 
-  .large-screen-only {
+  .container {
+    flex-flow: column wrap;
+  }
+
+  .io {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .largeScreenOnly {
     display: none !important;
   }
 
-  .small-screen-only {
+  .smallScreenOnly {
     display: block !important;
   }
 }

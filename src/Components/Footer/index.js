@@ -4,10 +4,10 @@ import { Glyphicon } from 'react-bootstrap';
 
 import ExtLink from '../ExtLink';
 
-import './index.css';
+import styles from './index.css';
 
 const Footer = () => (
-  <footer className="footer">
+  <footer className={styles.footer}>
     <p>
       App by <ExtLink href="https://www.collaborizm.com/profile/Hyt3y6XK?utm_content=user_link&utm_source=user_Hyt3y6XK">Harsha Alva</ExtLink>.
       Made for <ExtLink href="https://www.collaborizm.com/">Collaborizm</ExtLink> with <Glyphicon glyph="heart" /> and <ExtLink href="https://facebook.github.io/react/">React</ExtLink>
