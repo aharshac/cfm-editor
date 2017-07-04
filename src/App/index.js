@@ -4,7 +4,7 @@ import { cfmToHtml } from 'cfm-parser';
 
 import { Header, Footer, MdInput, HtmlOutput, DialogAlert, DialogHelp, DialogOkCancel, DialogFileName } from '../Components';
 import { saveIoState, loadIoState} from './Storage';
-import { saveAsMarkdown, saveAsHtml } from './Export';
+import { isSaveSupported, saveAsMarkdown, saveAsHtml } from './Export';
 
 import 'prismjs/themes/prism-okaidia.css';
 import 'cfm-parser/css/style.css';
@@ -86,11 +86,21 @@ class App extends Component {
     this.setAlertDialogHidden(false, 'File generated!');
   }
 
+  showNoSaveDialog = () => this.setAlertDialogHidden(false, 'Browser does not support saving!');
+
   handleSaveAsMarkdown = () => {
+    if (!isSaveSupported()) {
+      this.showNoSaveDialog();
+      return;
+    }
     this.setFileNameDialogHidden(false, App.SAVE_ACTION.markdown);
   }
 
   handleSaveAsHtml = () => {
+    if (!isSaveSupported()) {
+      this.showNoSaveDialog();
+      return;
+    }
     this.setFileNameDialogHidden(false, App.SAVE_ACTION.html);
   }
 

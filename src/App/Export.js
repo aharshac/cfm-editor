@@ -8,8 +8,16 @@ const removeExtension = (fileName, extensions) => {
   return fileName.replace(regex, '');
 };
 
-const save = (code, name, type = 'text/plain') => {
-  const blob = new Blob([code], { type });
+const isSaveSupported = () => {
+  try {
+    return !!new Blob;
+  } catch (e) {
+    return false;
+  }
+};
+
+const save = (code, name, mime = 'text/plain') => {
+  const blob = new Blob([code], { type: `${mime};charset=utf-8` });
   if (window.saveAs) {
     window.saveAs(blob, name);
   } else if(navigator.saveBlob) {
@@ -88,4 +96,4 @@ const saveAsHtml = (body, fileName) => {
   save(html, name, 'text/html');
 };
 
-export { saveAsMarkdown, saveAsHtml };
+export { isSaveSupported, saveAsMarkdown, saveAsHtml };

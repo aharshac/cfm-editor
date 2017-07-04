@@ -10,7 +10,7 @@ import styles from './index.css';
 
 const Header = () => (
   <header className={styles.header}>
-    <h2>React Markdown Editor</h2>
+    <h2>Collaborizm Markdown Editor</h2>
     <div className={styles.icons}>
       <ExtLink href="https://www.collaborizm.com">
         <img src={LogoCollaborizm} className={styles.logoCollaborizm} alt="collaborizm" />
