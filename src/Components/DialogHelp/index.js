@@ -26,7 +26,7 @@ export default class DialogHelp extends Component {
           <div className="help-intro">
             <h4>Introduction</h4>
             <p>This React app is made for <ExtLink href="https://www.Collaborizm.com/">Collaborizm</ExtLink>.</p>
-            <p>A big shout-out to <ExtLink href="https://www.collaborizm.com/profile/21339">Robert Lancer</ExtLink>, the CTO, and <ExtLink href="https://www.collaborizm.com/profile/4kvzVlj5e">Robert Lancer</ExtLink> the Design Lead of Collaborizm for inspiring this project.</p>
+            <p>A big shout-out to <ExtLink href="https://www.collaborizm.com/profile/21339">Robert Lancer</ExtLink>, the CTO, and <ExtLink href="https://www.collaborizm.com/profile/4kvzVlj5e">Anton Voltchok</ExtLink> the Design Lead of Collaborizm for inspiring this project.</p>
             <p>
               App by <ExtLink href="https://www.collaborizm.com/profile/Hyt3y6XK">Harsha Alva</ExtLink>.
               Made for <ExtLink href="https://www.collaborizm.com/">Collaborizm</ExtLink> with <Glyphicon glyph="heart" /> and <ExtLink href="https://facebook.github.io/react/">React</ExtLink>.
