@@ -17,6 +17,12 @@ class HtmlOutput extends Component {
   componentDidMount() {
     const { onMount } = this.props;
     if (onMount && this.elementNode) onMount(this.elementNode);
+    // if (onUpdate) onUpdate();
+  }
+
+  componentDidUpdate() {
+    // const { onUpdate } = this.props;
+    // if (onUpdate && this.elementNode) onUpdate(this.elementNode);
   }
 
   render () {
@@ -40,6 +46,7 @@ class HtmlOutput extends Component {
 HtmlOutput.propTypes = {
   html: PropTypes.node,
   onMount: PropTypes.func,
+  onUpdate: PropTypes.func,
   onScroll: PropTypes.func,
 };
 

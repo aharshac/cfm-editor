@@ -5,6 +5,8 @@
 }
 
 .content {
+  position: relative;
+  top: 0;
   height: 400px;
   overflow: auto;
   font-size: 16px;

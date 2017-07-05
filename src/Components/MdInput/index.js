@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import CodeMirror from '@skidding/react-codemirror';
+import 'codemirror/addon/scroll/scrollpastend';
 import 'codemirror/mode/gfm/gfm';
 
 import 'codemirror/lib/codemirror.css';
@@ -25,9 +26,10 @@ class MdInput extends Component {
 
     const options = {
       mode: 'gfm',
-      lineNumbers: false,
+      lineNumbers: true,
       matchBrackets: true,
       lineWrapping: true,
+      scrollPastEnd: true,
       extraKeys: {Enter: 'newlineAndIndentContinueMarkdownList'}
     };
 
