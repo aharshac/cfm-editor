@@ -9,5 +9,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 import './index.css';
 
-ReactDOM.render(<App />, document.getElementById('root'));
-registerServiceWorker();
+window.setTimeout(() => {
+  ReactDOM.render(<App />, document.getElementById('root'));
+  registerServiceWorker();
+}, 3000);

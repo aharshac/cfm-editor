@@ -7,9 +7,12 @@ import throttle from 'lodash.throttle';
 import { Header, Footer, MdInput, HtmlOutput, DialogAlert, DialogHelp, DialogOkCancel, DialogFileName } from '../Components';
 import { saveIoState, loadIoState} from './Storage';
 import { isSaveSupported, saveAsMarkdown, saveAsHtml } from './Export';
+// import { getScrollMap } from './Scroll';
 
+import 'prismjs/components/prism-markdown.js';
 import 'prismjs/themes/prism-okaidia.css';
 import 'cfm-parser/css/style.css';
+
 import styles from './index.css';
 
 import sample from './Sample.json';
@@ -27,6 +30,7 @@ class App extends Component {
       htmlOutput: cfmToHtml(sample.sample),
       refCmInput: null,
       refElOutput: null,
+      scrollMap: {},
       isScrollingInput: false,
       isScrollingOutput: false,
       alert: '',
@@ -44,7 +48,8 @@ class App extends Component {
     const ioState = loadIoState();
     if (ioState) {
       const mdInput = (ioState.mdInput ? ioState.mdInput : sample.sample);
-      this.setState({ mdInput, htmlOutput: cfmToHtml(mdInput) });
+      // this.setState({ mdInput, htmlOutput: cfmToHtml(mdInput) });
+      this.setIo(mdInput);
     }
     // this.onInputScroll();
   }
@@ -54,13 +59,20 @@ class App extends Component {
     saveIoState({ mdInput });
   }
 
+  setIo = (mdInput) => {
+    const htmlOutput = mdInput && mdInput.length > 0 ? cfmToHtml(mdInput) : '';
+    this.setState({ mdInput, htmlOutput });
+    this.onInputScroll();
+  }
+
   loadSample = () => {
-    this.setState({ mdInput: sample.sample, htmlOutput: cfmToHtml(sample.sample) });
+    // this.setState({ mdInput: sample.sample, htmlOutput: cfmToHtml(sample.sample) });
+    this.setIo(sample.sample);
     this.setSampleLoadDialogHidden(true);
     this.setAlertDialogHidden(false, 'Sample loaded!');
   };
 
-  resetValue = () => this.setState({ mdInput: '', htmlOutput: '' });
+  resetValue = () => this.setIo(''); // this.setState({ mdInput: '', htmlOutput: '' });
 
   handleSampleLoad = () => {
     const { mdInput } = this.state;
@@ -107,11 +119,21 @@ class App extends Component {
     this.setFileNameDialogHidden(false, App.SAVE_ACTION.html);
   }
 
+  // buildScrollMap = () => {
+  //   const { refElOutput } = this.state;
+  //   const scrollMap = getScrollMap(refElOutput);
+  //   console.log(scrollMap);
+  //   this.setState({ scrollMap });
+  // }
+
   onInputChange = debounce((newValue) => {
-    this.setState({ mdInput: newValue, htmlOutput: cfmToHtml(newValue) });
+    // this.setState({ mdInput: newValue, htmlOutput: cfmToHtml(newValue) });
+    this.setIo(newValue);
+    // this.onInputScroll();
+    // this.buildScrollMap();
   }, 10);
 
-  onInputScroll = throttle(() => {
+  onInputScroll = debounce(() => {
     const { refElOutput, refCmInput, isScrollingOutput } = this.state;
     if (!refElOutput || !refCmInput) return;
 
@@ -121,6 +143,11 @@ class App extends Component {
     }
 
     this.setState({ isScrollingInput: true });
+
+    // if(Object.keys(scrollMap).length === 0) {
+    //   this.buildScrollMap();
+    // }
+
     // const { top, height, clientHeight } = refCmInput.getScrollInfo();
     const { top } = refCmInput.getScrollInfo();
 
@@ -142,7 +169,7 @@ class App extends Component {
         outputTop = child.offsetTop + child.offsetHeight;
       }
     }
-    console.log(outputTop);
+    // console.log(outputTop);
     refElOutput.scrollTop = outputTop;
 
     /* Percentage based scrolling */
@@ -151,10 +178,10 @@ class App extends Component {
     // if (Math.round(refElOutput.scrollTop - scrollPos)){
     //   refElOutput.scrollTop = scrollPos;
     // }
-  }, 800);
+  }, 100);
 
-  onOutputScroll = debounce(() => {
-    const { refElOutput, refCmInput, isScrollingInput } = this.state;
+  onOutputScroll = throttle(() => {
+    const { refElOutput, refCmInput, isScrollingInput, scrollMap } = this.state;
     if (!refElOutput || !refCmInput) return;
 
     if (isScrollingInput) {
@@ -163,16 +190,31 @@ class App extends Component {
     }
 
     this.setState({ isScrollingOutput: true });
-    const { height, clientHeight } = refCmInput.getScrollInfo();
 
-    const rate = refElOutput.scrollTop / (refElOutput.scrollHeight - refElOutput.clientHeight);
-    const scrollPos = Math.round(rate * (height - clientHeight));
-    if (Math.round(refElOutput.scrollTop - scrollPos)){
-      refCmInput.scrollTo(null, scrollPos);
+    // if(Object.keys(scrollMap).length === 0) {
+    //   this.buildScrollMap();
+    // }
+
+    console.log(refElOutput.scrollTop);
+    const top = refElOutput.scrollTop;
+    for(let i=0; i < Object.keys(scrollMap).length; i++) {
+      const obj = scrollMap[i]; //  > 0 ? i-1 : 0
+      if (obj.start <= top && top < obj.end && obj.line < refCmInput.lineCount()) {
+        refCmInput.scrollTo(null, refCmInput.heightAtLine(Number(obj.line) + 1));
+        return;
+      }
     }
 
+    // const { height, clientHeight } = refCmInput.getScrollInfo();
+    //
+    // const rate = refElOutput.scrollTop / (refElOutput.scrollHeight - refElOutput.clientHeight);
+    // const scrollPos = Math.round(rate * (height - clientHeight));
+    // if (Math.round(refElOutput.scrollTop - scrollPos)){
+    //   refCmInput.scrollTo(null, scrollPos);
+    // }
+
     // onScroll={this.onOutputScroll}
-  }, 800);
+  }, 100);
 
   /* Dialog related */
   setSampleLoadDialogHidden = (sampleLoadDialogHidden = true) => this.setState({ sampleLoadDialogHidden });
