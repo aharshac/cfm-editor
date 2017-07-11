@@ -51,6 +51,13 @@ export default class DialogHelp extends Component {
                 <p>Export the parsed HTML to disc.</p>
               </li>
 
+              {/*
+                <li>
+                  <b>Permalink</b>
+                  <p>Share link with URL</p>
+                </li>
+              */}
+
               <li>
                 <b>State Persistence</b>
                 <p>Saves the input markdown in the browser's LocalStorage.</p>
@@ -58,7 +65,7 @@ export default class DialogHelp extends Component {
 
               <li>
                 <b>Synchronized scrolling</b>
-                <p>Output corresponds to input and vice-versa when scrolled.</p>
+                <p>Output corresponds to input when scrolled.</p>
               </li>
 
               <li>
