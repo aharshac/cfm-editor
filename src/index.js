@@ -12,4 +12,4 @@ import './index.css';
 window.setTimeout(() => {
   ReactDOM.render(<App />, document.getElementById('root'));
   registerServiceWorker();
-}, 3000);
+}, 500);

@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import { ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
 import { cfmToHtml } from 'cfm-parser';
 import debounce from 'lodash.debounce';
-import throttle from 'lodash.throttle';
+// import throttle from 'lodash.throttle';
+import copy from 'copy-to-clipboard';
 
 import { Header, Footer, MdInput, HtmlOutput, DialogAlert, DialogHelp, DialogOkCancel, DialogFileName } from '../Components';
 import { saveIoState, loadIoState} from './Storage';
 import { isSaveSupported, saveAsMarkdown, saveAsHtml } from './Export';
-// import { getScrollMap } from './Scroll';
+import { encodeInput, decodeHash, getPermalink, getDocHash } from './Permalink';
 
 import 'prismjs/components/prism-markdown.js';
 import 'prismjs/themes/prism-okaidia.css';
@@ -26,13 +27,13 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      mdInput: sample.sample,
-      htmlOutput: cfmToHtml(sample.sample),
+      mdInput: '',
+      htmlOutput: '',
       refCmInput: null,
       refElOutput: null,
-      scrollMap: {},
       isScrollingInput: false,
       isScrollingOutput: false,
+      docHash: '',
       alert: '',
       saveAction: '',
       fileName: 'Untitled',
@@ -41,17 +42,33 @@ class App extends Component {
       helpDialogHidden: true,
       alertDialogHidden: true,
       fileNameDialogHidden: true,
+      conflictDialogHidden: true
     };
   }
 
   componentDidMount() {
-    const ioState = loadIoState();
-    if (ioState) {
-      const mdInput = (ioState.mdInput ? ioState.mdInput : sample.sample);
-      // this.setState({ mdInput, htmlOutput: cfmToHtml(mdInput) });
-      this.setIo(mdInput);
-    }
-    // this.onInputScroll();
+    // const ioState = loadIoState();
+    // // const mdInput = (ioState && ioState.mdInput ? ioState.mdInput : false);
+    // if (ioState && ioState.mdInput) {
+    //   const mdInput = ioState.mdInput;
+    //   this.setState({ mdInput, htmlOutput: cfmToHtml(mdInput) });
+    // }
+    this.onHashChange();
+
+
+    // const hash = getDocHash(window.location.hash);
+    //
+    // if (mdInput && hash) {
+    //   this.setState({ conflictDialogHidden: false, mdInput, docHash: hash });
+    // } else if (hash) {
+    //   this.setIo(decodeHash(hash));
+    // } else if (mdInput) {
+    //   this.setIo(mdInput);
+    // } else {
+    //   this.setIo(sample.sample);
+    // }
+    this.onInputScroll();
+    // window.addEventListener("hashchange", this.onHashChange, false);
   }
 
   componentDidUpdate() {
@@ -59,9 +76,61 @@ class App extends Component {
     saveIoState({ mdInput });
   }
 
+  componentWillUnmount() {
+    // window.removeEventListener("hashchange", this.onHashChange, false);
+  }
+
+  onHashChange = () => {
+    // const mdInput = (this.state.mdInput ? this.state.mdInput : false);
+    // this.setState({ mdInput, htmlOutput: cfmToHtml(mdInput) });
+
+    let { mdInput } = this.state;
+    if (!mdInput) {
+      const ioState = loadIoState();
+      mdInput = (ioState && ioState.mdInput ? ioState.mdInput : false);
+    }
+    const hash = getDocHash(window.location.hash);
+
+    if (mdInput && hash) {
+      this.setState({ conflictDialogHidden: false, mdInput, docHash: hash });
+      console.log('both');
+    } else if (hash) {
+      this.setIo(decodeHash(hash));
+      console.log('hash');
+    } else if (mdInput) {
+      this.setIo(mdInput);
+      console.log('mdInput');
+    } else {
+      this.setIo(sample.sample);
+      console.log('none');
+    }
+    this.forceUpdate();
+  }
+
+  resolveDocConflict = (discardLocal = false) => {
+    const { docHash, mdInput } = this.state;
+
+    if (discardLocal) {
+      this.setIo(decodeHash(docHash));
+    } else {
+      this.setIo(mdInput);
+    }
+
+    window.location.hash = '';
+    this.setConflictDialogHidden(true);
+  }
+
+
   setIo = (mdInput) => {
     const htmlOutput = mdInput && mdInput.length > 0 ? cfmToHtml(mdInput) : '';
-    this.setState({ mdInput, htmlOutput });
+    const docHash = encodeInput(mdInput);
+    // console.log(docHash);
+    this.setState({ mdInput, htmlOutput, docHash });
+
+    // const { refCmInput } = this.state;
+    // if (refCmInput) {
+    //   refCmInput.scrollIntoView({ line: refCmInput.lastLine(), ch: null });
+    // }
     this.onInputScroll();
   }
 
@@ -119,12 +188,19 @@ class App extends Component {
     this.setFileNameDialogHidden(false, App.SAVE_ACTION.html);
   }
 
-  // buildScrollMap = () => {
-  //   const { refElOutput } = this.state;
-  //   const scrollMap = getScrollMap(refElOutput);
-  //   console.log(scrollMap);
-  //   this.setState({ scrollMap });
-  // }
+  handleCopyPermalink = () => {
+    const { docHash } = this.state;
+
+    if (!docHash) {
+      this.setAlertDialogHidden(false, 'Permalink could not be generated. Try again.');
+      return;
+    }
+
+    const link = getPermalink(docHash);
+    if (copy(link)) {
+      this.setAlertDialogHidden(false, 'Permalink is copied to the clipboard.');
+    }
+  }
 
   onInputChange = debounce((newValue) => {
     // this.setState({ mdInput: newValue, htmlOutput: cfmToHtml(newValue) });
@@ -166,6 +242,7 @@ class App extends Component {
       const length = parse.body.children.length;
       if (length > 0) {
         const child = refElOutput.children[length - 1];
+        if (!child) return;
         outputTop = child.offsetTop + child.offsetHeight;
       }
     }
@@ -180,6 +257,7 @@ class App extends Component {
     // }
   }, 100);
 
+  /*
   onOutputScroll = throttle(() => {
     const { refElOutput, refCmInput, isScrollingInput, scrollMap } = this.state;
     if (!refElOutput || !refCmInput) return;
@@ -215,6 +293,7 @@ class App extends Component {
 
     // onScroll={this.onOutputScroll}
   }, 100);
+  */
 
   /* Dialog related */
   setSampleLoadDialogHidden = (sampleLoadDialogHidden = true) => this.setState({ sampleLoadDialogHidden });
@@ -227,11 +306,15 @@ class App extends Component {
 
   setFileNameDialogHidden = (fileNameDialogHidden = true, saveAction = '') => this.setState({ fileNameDialogHidden, saveAction });
 
+  setHelpDialogHidden = (helpDialogHidden = true) => this.setState({ helpDialogHidden });
+
+  setConflictDialogHidden = (conflictDialogHidden = true) => this.setState({ conflictDialogHidden });
+
   render() {
     const {
       mdInput, htmlOutput,
       alert, saveAction,
-      sampleLoadDialogHidden, clearDialogHidden, helpDialogHidden, alertDialogHidden, fileNameDialogHidden
+      sampleLoadDialogHidden, clearDialogHidden, helpDialogHidden, alertDialogHidden, fileNameDialogHidden, conflictDialogHidden
     } = this.state;
 
     return (
@@ -253,6 +336,11 @@ class App extends Component {
           <Button bsStyle="success" onClick={this.handleSaveAsHtml} className={styles.toolbarButton}>
             <Glyphicon glyph="floppy-save" /> <b>Save HTML</b>
           </Button>
+
+          <Button bsStyle="default" onClick={this.handleCopyPermalink} className={styles.toolbarButton}>
+            <Glyphicon glyph="copy" /> <b>Copy Permalink</b>
+          </Button>
+
           <Button bsStyle="danger" onClick={() => this.handleClear()} className={styles.toolbarButton}>
             <Glyphicon glyph="trash" /> <b>Clear</b>
           </Button>
@@ -312,6 +400,15 @@ class App extends Component {
           onOk={this.onFileNameSet}
           onCancel={() => this.setFileNameDialogHidden(true)}
           hidden={fileNameDialogHidden} />
+
+        {/* Hash and localStorage conflict */}
+          <DialogOkCancel
+            txtTitle="Discard document from Local Storage?"
+            onOk={() => this.resolveDocConflict(true)}
+            onCancel={() => this.resolveDocConflict(false)}
+            hidden={conflictDialogHidden}>
+              This action cannot be undone.
+          </DialogOkCancel>
 
         <Footer />
       </div>
